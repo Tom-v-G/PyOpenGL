@@ -39,10 +39,26 @@ class App:
     def run(self):
         curr_time = glfw.get_time()
         frame_count = 0 
+
+        u_center = np.array([0.5, 0.5], dtype=np.float32)
+        toggle = False
+
         while not glfw.window_should_close(self.window):
             if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_ESCAPE) == GLFW_CONSTANTS.GLFW_PRESS:
                 break
             glfw.poll_events()
+
+            if glfw.get_mouse_button(self.window, GLFW_CONSTANTS.GLFW_MOUSE_BUTTON_1) == GLFW_CONSTANTS.GLFW_PRESS:
+                toggle = True
+
+            if toggle: 
+                u_center = np.array(glfw.get_cursor_pos(self.window), dtype=np.float32)
+                u_center[0] = u_center[0] / SCREEN_WIDTH
+                u_center[1] = 1 - (u_center[1] / SCREEN_HEIGHT)
+                print(u_center)
+                toggle = False
+            
+
 
             u_time = glfw.get_time()
             
@@ -82,6 +98,11 @@ class App:
             # Specify Screensize
             location = glGetUniformLocation(self.shader, "u_resolution")
             glUniform2f(location, SCREEN_WIDTH, SCREEN_HEIGHT)
+
+            # Add 'center' position for radial shaders 
+            location = glGetUniformLocation(self.shader, "u_center")
+            glUniform2f(location, u_center[0], u_center[1])
+
 
             glBindVertexArray(self.quad_vbo)
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, ctypes.c_void_p(0))

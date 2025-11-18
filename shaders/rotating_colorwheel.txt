@@ -8,6 +8,7 @@ out vec4 screenColor;
 
 uniform float u_time;
 uniform vec2 u_resolution;
+uniform vec2 u_center; 
 
 //  Function from Iñigo Quiles
 //  https://www.shadertoy.com/view/MsS3Wc
@@ -25,7 +26,7 @@ void main() {
     vec2 uv = gl_FragCoord.xy / u_resolution;
     vec3 color = vec3(0.0);
     // Use polar coordinates instead of cartesian
-    vec2 toCenter = vec2(0.5)-uv;
+    vec2 toCenter = u_center - uv;
     float angle = atan(toCenter.y,toCenter.x) + u_time;
     float radius = length(toCenter)*2.0;
 

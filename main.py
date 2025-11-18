@@ -34,7 +34,7 @@ class App:
         # self.triangle_buffers, self.triangle_vao = mesh_factory.build_triangle_mesh()
         # self.triangle_vbo, self.triangle_vao = mesh_factory.build_triangle_mesh_2()
         self.quad_ebo, self.quad_vbo, self.quad_vao = mesh_factory.build_quad_mesh()
-        self.shader = create_shader_program("shaders/vertex.txt", "shaders/fragment.txt")
+        self.shader = create_shader_program("shaders/vertex.txt", "shaders/rotating_colorwheel.txt")
 
     def run(self):
         curr_time = glfw.get_time()
@@ -44,21 +44,26 @@ class App:
                 break
             glfw.poll_events()
 
-            c = np.cos(glfw.get_time())
-            s = np.sin(glfw.get_time())
+            u_time = glfw.get_time()
+            
+            # Time dependent Rotation example
+            # c = np.cos(u_time)
+            # s = np.sin(u_time)
 
-            transform = np.array([
-                [c, -s, 0, 0],
-                [s, c, 0, 0 ],
-                [0, 0, 1, 0],
-                [0, 0, 0, 1]], dtype=np.float32
-            )
+            # transform = np.array([
+            #     [c, -s, 0, 0],
+            #     [s, c, 0, 0 ],
+            #     [0, 0, 1, 0],
+            #     [0, 0, 0, 1]], dtype=np.float32
+            # )
+
+            transform = np.identity(4, dtype=np.float32)
 
             glClear(GL_COLOR_BUFFER_BIT)
 
             # Specify shader
             glUseProgram(self.shader)
-            location = glGetUniformLocation(self.shader, "model")
+            location = glGetUniformLocation(self.shader, "model") #get location on GPU using name of variable
             glUniformMatrix4fv(
                 location,
                 1, # amt of matrices
@@ -69,6 +74,14 @@ class App:
             # glBindVertexArray(self.triangle_vao)
              # Specify draw_method and mesh length
             # glDrawArrays(GL_TRIANGLES, 0, 3)
+
+            # Specify Time
+            location = glGetUniformLocation(self.shader, "u_time") #get location on GPU using name of variable
+            glUniform1f(location, u_time)
+
+            # Specify Screensize
+            location = glGetUniformLocation(self.shader, "u_resolution")
+            glUniform2f(location, SCREEN_WIDTH, SCREEN_HEIGHT)
 
             glBindVertexArray(self.quad_vbo)
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, ctypes.c_void_p(0))

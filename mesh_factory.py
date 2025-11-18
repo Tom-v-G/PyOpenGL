@@ -116,10 +116,10 @@ def build_quad_mesh() -> tuple[int, int, int]:
     
     vertex_data = np.zeros(4, dtype = data_type_vertex)
 
-    vertex_data[0] = (-0.75, -0.75, 0.0, 0) 
-    vertex_data[1] = (0.75, -0.75, 0.0, 1)
-    vertex_data[2] = (0.75, 0.75, 0.0, 2)
-    vertex_data[3] = (-0.75, 0.75, 0.0, 1)
+    vertex_data[0] = (-1, -1, 0.0, 0) 
+    vertex_data[1] = (1, -1, 0.0, 1)
+    vertex_data[2] = (1, 1, 0.0, 2)
+    vertex_data[3] = (-1, 1, 0.0, 1)
 
     index_data = np.array((0, 1, 2, 2, 3, 0), dtype = np.ubyte)
 

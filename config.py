@@ -4,9 +4,6 @@ import glfw.GLFW as GLFW_CONSTANTS
 from OpenGL.GL import *
 from OpenGL.GL.shaders import compileProgram, compileShader
 
-SCREEN_WIDTH = 1920
-SCREEN_HEIGHT = 1080
-
 data_type_vertex = np.dtype({
     "names": ["x", "y", "z" , "color"],
     "formats": [np.float32, np.float32, np.float32, np.uint32],

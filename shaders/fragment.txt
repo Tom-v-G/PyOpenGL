@@ -4,16 +4,6 @@ in vec3 fragmentColor;
 
 out vec4 screenColor;
 
-uniform float u_time;
-uniform vec2 u_resolution;
-
 void main() {
-
-    vec2 uv = gl_FragCoord.xy / u_resolution;
-
-    screenColor = vec4(
-        abs(uv.x + sin(u_time + fragmentColor[0])),
-        abs(uv.y + cos(u_time + fragmentColor[1])), 
-        fragmentColor[2], 
-         1.0);
+    screenColor = vec4(fragmentColor, 1.0);
 }

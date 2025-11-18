@@ -116,17 +116,23 @@ def build_quad_mesh() -> tuple[int, int, int]:
     
     vertex_data = np.zeros(4, dtype = data_type_vertex)
 
-    vertex_data[0] = (-1, -1, 0.0, 0) 
-    vertex_data[1] = (1, -1, 0.0, 1)
-    vertex_data[2] = (1, 1, 0.0, 2)
-    vertex_data[3] = (-1, 1, 0.0, 1)
+    # vertex_data[0] = (-1, -1, 0.0, 0) 
+    # vertex_data[1] = (1, -1, 0.0, 1)
+    # vertex_data[2] = (1, 1, 0.0, 2)
+    # vertex_data[3] = (-1, 1, 0.0, 1)
+
+    
+    vertex_data[0] = (-0.5, -0.5, 0.0, 0) 
+    vertex_data[1] = (0.5, -0.5, 0.0, 1)
+    vertex_data[2] = (0.5, 0.5, 0.0, 2)
+    vertex_data[3] = (-0.5, 0.5, 0.0, 1)
 
     index_data = np.array((0, 1, 2, 2, 3, 0), dtype = np.ubyte)
 
-    vao = glGenVertexArrays(1)
+    vao = int(glGenVertexArrays(1))
     glBindVertexArray(vao)
 
-    vbo = glGenBuffers(1)
+    vbo = int(glGenBuffers(1))
     glBindBuffer(GL_ARRAY_BUFFER, vbo)
     glBufferData(GL_ARRAY_BUFFER, vertex_data.nbytes, vertex_data, GL_STATIC_DRAW)
 
@@ -163,7 +169,7 @@ def build_quad_mesh() -> tuple[int, int, int]:
     glEnableVertexAttribArray(attribute_index)
 
     # Element Buffer Object
-    ebo = glGenBuffers(1)
+    ebo = int(glGenBuffers(1))
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_data.nbytes, index_data, GL_STATIC_DRAW)
 

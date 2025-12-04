@@ -26,6 +26,8 @@ class Plane():
         glBindVertexArray(self.vao)
 
         self.vbo = glGenBuffers(1)
+        print(self.vao)
+        print(self.vbo)
         glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
         glBufferData(GL_ARRAY_BUFFER, self.vertices.nbytes, self.vertices, GL_STATIC_DRAW)
 
@@ -64,7 +66,7 @@ class Plane():
         return (None, self.vbo, self.vao)
 
     def render(self):
-        glBindVertexArray(self.vbo)
+        glBindVertexArray(self.vao)
         glDrawArrays(GL_TRIANGLE_STRIP, 0, self.triangles())
 
     def delete(self):

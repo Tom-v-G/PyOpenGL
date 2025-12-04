@@ -78,6 +78,7 @@ class App:
         # GL commands
         glClearColor(0.1, 0.2, 0.4, 1.0)
         glEnable(GL_DEPTH_TEST)
+        glEnable(GL_CULL_FACE)
 
         # Mesh loader
         # self.triangle_buffers, self.triangle_vao = mesh_factory.build_triangle_mesh()
@@ -101,10 +102,10 @@ class App:
         # self.triangle_amt = obj.triangles()
 
     def initialize_models(self):
-        # cube_amt = 3
-        # for i in range(cube_amt):
-        #     self.models.append(Model("cube", 0.5, i - cube_amt // 2, 0, 0))
-        #     self.models.append(Model("cube", 0.5, i, 0, 0))
+        cube_amt = 3
+        for i in range(cube_amt):
+            self.models.append(Model("cube", 0.5, i - cube_amt // 2, 0, 3))
+            # self.models.append(Model("cube", 0.5, i, 0, 0))
         self.models.append(Model("sphere", (0, 0, 0), 1, num_vertices=100))
         self.models.append(Model("plane", (-1, -1, -1), (-1, -1, 1), (1, -1, -1), (1, -1, 1), 2))
 

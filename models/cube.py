@@ -11,20 +11,20 @@ class Cube():
         
         self.vertices = np.zeros(36, dtype= data_type_vertex)
         # Front Face
-        self.vertices[0] = (x - size / 2, y - size / 2, z - size / 2, face_colors[0])
-        self.vertices[1] = (x + size / 2, y - size / 2, z - size / 2, face_colors[0])
-        self.vertices[2] = (x - size / 2, y + size / 2, z - size / 2, face_colors[0])
-        self.vertices[3] = (x - size / 2, y + size / 2, z - size / 2, face_colors[0])
+        self.vertices[5] = (x - size / 2, y - size / 2, z - size / 2, face_colors[0])
         self.vertices[4] = (x + size / 2, y - size / 2, z - size / 2, face_colors[0])
-        self.vertices[5] = (x + size / 2, y + size / 2, z - size / 2, face_colors[0])
+        self.vertices[3] = (x - size / 2, y + size / 2, z - size / 2, face_colors[0])
+        self.vertices[2] = (x - size / 2, y + size / 2, z - size / 2, face_colors[0])
+        self.vertices[1] = (x + size / 2, y - size / 2, z - size / 2, face_colors[0])
+        self.vertices[0] = (x + size / 2, y + size / 2, z - size / 2, face_colors[0])
 
         # Left Face 
-        self.vertices[6] = (x - size / 2, y - size / 2, z - size / 2, face_colors[1])
-        self.vertices[7] = (x - size / 2, y + size / 2, z - size / 2, face_colors[1])
-        self.vertices[8] = (x - size / 2, y - size / 2, z + size / 2, face_colors[1])
-        self.vertices[9] = (x - size / 2, y + size / 2, z - size / 2, face_colors[1])
-        self.vertices[10] = (x - size / 2, y + size / 2, z + size / 2, face_colors[1])
-        self.vertices[11] = (x - size / 2, y - size / 2, z + size / 2, face_colors[1])
+        self.vertices[11] = (x - size / 2, y - size / 2, z - size / 2, face_colors[1])
+        self.vertices[10] = (x - size / 2, y + size / 2, z - size / 2, face_colors[1])
+        self.vertices[9] = (x - size / 2, y - size / 2, z + size / 2, face_colors[1])
+        self.vertices[8] = (x - size / 2, y + size / 2, z - size / 2, face_colors[1])
+        self.vertices[7] = (x - size / 2, y + size / 2, z + size / 2, face_colors[1])
+        self.vertices[6] = (x - size / 2, y - size / 2, z + size / 2, face_colors[1])
 
         # Right Face 
         self.vertices[12] = (x + size / 2, y - size / 2, z - size / 2, face_colors[2])
@@ -35,12 +35,12 @@ class Cube():
         self.vertices[17] = (x + size / 2, y - size / 2, z + size / 2, face_colors[2])
 
         # Top Face
-        self.vertices[18] = (x - size / 2, y + size / 2, z - size / 2, face_colors[3])
-        self.vertices[19] = (x + size / 2, y + size / 2, z - size / 2, face_colors[3])
-        self.vertices[20] = (x - size / 2, y + size / 2, z + size / 2, face_colors[3])
-        self.vertices[21] = (x - size / 2, y + size / 2, z + size / 2, face_colors[3])
+        self.vertices[23] = (x - size / 2, y + size / 2, z - size / 2, face_colors[3])
         self.vertices[22] = (x + size / 2, y + size / 2, z - size / 2, face_colors[3])
-        self.vertices[23] = (x + size / 2, y + size / 2, z + size / 2, face_colors[3])
+        self.vertices[21] = (x - size / 2, y + size / 2, z + size / 2, face_colors[3])
+        self.vertices[20] = (x - size / 2, y + size / 2, z + size / 2, face_colors[3])
+        self.vertices[19] = (x + size / 2, y + size / 2, z - size / 2, face_colors[3])
+        self.vertices[18] = (x + size / 2, y + size / 2, z + size / 2, face_colors[3])
 
         # Bottom Face
         self.vertices[24] = (x - size / 2, y - size / 2, z - size / 2, face_colors[4])

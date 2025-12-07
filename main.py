@@ -93,7 +93,9 @@ class App:
         # cube_obj = Cube(0.5, 0, 0, 0)
         # self.EBO, self.VBO, self.VAO = cube_obj.build_cube_mesh()
         # print(f"{self.EBO, self.VBO, self.VAO}")
-        self.shader = create_shader_program("shaders/vertex.txt", "shaders/fragment.txt")
+        # self.shader = create_shader_program("shaders/vertex/vertex.txt", "shaders/geometry/passthrough.txt", "shaders/fragment/fragment.txt")
+        self.shader = create_shader_program("shaders/vertex/vertex.txt", "shaders/geometry/wireframe.txt", "shaders/fragment/wireframe.txt")
+
         # self.triangle_amt = 64
 
         # obj = ObjLoader("teapot.obj")
@@ -104,9 +106,9 @@ class App:
     def initialize_models(self):
         cube_amt = 3
         for i in range(cube_amt):
-            self.models.append(Model("cube", 0.5, i - cube_amt // 2, 0, 3))
+            self.models.append(Model("cube", 0.5, i - cube_amt // 2, 0, -3))
             # self.models.append(Model("cube", 0.5, i, 0, 0))
-        self.models.append(Model("sphere", (0, 0, 0), 1, num_vertices=100))
+        self.models.append(Model("sphere", np.array([3., 2., 0.]), 2, 0, num_vertices=1000))
         self.models.append(Model("plane", (-1, -1, -1), (-1, -1, 1), (1, -1, -1), (1, -1, 1), 2))
 
     def create_lookat_matrix(self):
@@ -173,22 +175,22 @@ class App:
 
         # Camera Strafing Movement
         if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_W) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pos[2] -= self.movement_speed
+            self.camera_pos += self.movement_speed * self.camera_front
             # self.camera_target[2] -= self.movement_speed
         if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_S) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pos[2] += self.movement_speed
+            self.camera_pos -= self.movement_speed * self.camera_front
             # self.camera_target[2] += self.movement_speed
         if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_D) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pos[0] += self.movement_speed
+            self.camera_pos += self.movement_speed * np.cross(self.camera_front, self.camera_up)
             # self.camera_target[0] += self.movement_speed
         if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_A) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pos[0] -= self.movement_speed
+            self.camera_pos -= self.movement_speed * np.cross(self.camera_front, self.camera_up)
             # self.camera_target[0] -= self.movement_speed
         if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_SPACE) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pos[1] += self.movement_speed
+            self.camera_pos += self.movement_speed * self.camera_up
             # self.camera_target[1] += self.movement_speed
         if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_LEFT_SHIFT) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pos[1] -= self.movement_speed
+            self.camera_pos -= self.movement_speed * self.camera_up
             # self.camera_target[1] -= self.movement_speed
 
         # # Camera Rotation 
@@ -321,9 +323,9 @@ class App:
                 frame_count = 0
                 curr_time = new_time
 
-                print(self.camera_yaw)
-                print(self.camera_pitch)
-                print(self.camera_front)                
+                # print(self.camera_yaw)
+                # print(self.camera_pitch)
+                # print(self.camera_front)                
 
             frame_count += 1
 

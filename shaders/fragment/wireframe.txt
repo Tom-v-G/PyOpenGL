@@ -1,0 +1,14 @@
+#version 330 core
+
+const vec4 WIRE_COL = vec4(0.0, 1.0, 0.0, 1.0);
+
+in vec3 vFragColor;
+in vec3 dist;
+
+out vec4 screenColor;
+
+void main() {
+    float d = min(dist[0], min(dist[1], dist[2]));
+    float I = exp2(-2 * d * d);
+    screenColor = I * WIRE_COL + (1.0 - I) * vec4(vFragColor, 1.0);
+}

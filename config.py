@@ -11,14 +11,16 @@ data_type_vertex = np.dtype({
     "itemsize": 16
 })
 
-def create_shader_program(vertex_filepath: str, fragment_filepath: str) -> int:
+def create_shader_program(vertex_filepath: str, geometry_filepath: str, fragment_filepath: str) -> int:
 
     vertex_module = create_shader_module(vertex_filepath, GL_VERTEX_SHADER)
+    geometry_module = create_shader_module(geometry_filepath, GL_GEOMETRY_SHADER)
     fragment_module = create_shader_module(fragment_filepath, GL_FRAGMENT_SHADER)
 
-    shader = compileProgram(vertex_module, fragment_module)
+    shader = compileProgram(vertex_module, geometry_module, fragment_module)
 
     glDeleteShader(vertex_module)
+    glDeleteShader(geometry_module)
     glDeleteShader(fragment_module)
 
     return shader

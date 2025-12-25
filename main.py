@@ -32,13 +32,37 @@ class Model:
     def delete(self):
         self.obj.delete()
 
+class ShaderGroup:
+
+    def __init__(self, filepath):
+        self.shader = create_shader_program(f"{filepath}/vertex.txt", f"{filepath}/geometry.txt", f"{filepath}/fragment.txt")
+        self.models = []
+    
+    def render(self):
+        if not self.models:
+            pass
+        for model in self.models:
+            model.render()
+    
+    def add_models(self, model_list):
+        for model in model_list:
+            self.models.append(model)
+
+    def delete(self):
+        for model in self.models:
+            model.delete() 
+        glDeleteProgram(self.shader)
+        
+
 class App:
 
     def __init__(self, SCREEN_SIZE):
         # OpenGL
         self.SCREEN_WIDTH = SCREEN_SIZE[0]
         self.SCREEN_HEIGHT = SCREEN_SIZE[1]
-        self.models = []
+
+        self.shadergroups = []
+        
         self.initialize_glfw()
         self.initialize_opengl()
         self.initialize_models()
@@ -80,36 +104,27 @@ class App:
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_CULL_FACE)
 
-        # Mesh loader
-        # self.triangle_buffers, self.triangle_vao = mesh_factory.build_triangle_mesh()
-        # self.triangle_vbo, self.triangle_vao = mesh_factory.build_triangle_mesh_2()
-
-        # self.EBO, self.VBO, self.VAO = mesh_factory.build_quad_mesh()
-        # self.shader = create_shader_program("shaders/vertex.txt", "shaders/fragment_3.txt")
-        # self.shader = create_shader_program("shaders/vertex.txt", "shaders/fragment.txt")
-        # self.shader = create_shader_program("shaders/vertex.txt", "shaders/rotating_colorwheel.txt")
-        # self.triangle_amt = 64
-
-        # cube_obj = Cube(0.5, 0, 0, 0)
-        # self.EBO, self.VBO, self.VAO = cube_obj.build_cube_mesh()
-        # print(f"{self.EBO, self.VBO, self.VAO}")
-        # self.shader = create_shader_program("shaders/vertex/vertex.txt", "shaders/geometry/passthrough.txt", "shaders/fragment/fragment.txt")
-        self.shader = create_shader_program("shaders/vertex/vertex.txt", "shaders/geometry/wireframe.txt", "shaders/fragment/wireframe.txt")
-
-        # self.triangle_amt = 64
-
-        # obj = ObjLoader("teapot.obj")
-        # self.EBO, self.VBO, self.VAO = obj.build_mesh()
-        # self.shader = create_shader_program("shaders/vertex.txt", "shaders/fragment.txt")
-        # self.triangle_amt = obj.triangles()
-
     def initialize_models(self):
+
+        # Default rendering technique
+        standard_shader = ShaderGroup("shaders/standard")
+        standard_shader.add_models(
+            [
+                Model("plane", (-1, -1, -1), (-1, -1, 1), (1, -1, -1), (1, -1, 1), 2)
+            ]
+        )
+        
+        self.shadergroups.append(standard_shader)
+
+        # Wireframe mesh rendering
+        wireframe_shader = ShaderGroup("shaders/wireframe")
         cube_amt = 3
-        for i in range(cube_amt):
-            self.models.append(Model("cube", 0.5, i - cube_amt // 2, 0, -3))
-            # self.models.append(Model("cube", 0.5, i, 0, 0))
-        self.models.append(Model("sphere", np.array([3., 2., 0.]), 2, 0, num_vertices=1000))
-        self.models.append(Model("plane", (-1, -1, -1), (-1, -1, 1), (1, -1, -1), (1, -1, 1), 2))
+        wireframe_shader.add_models(
+            [Model("cube", 0.5, i - cube_amt // 2, 0, -3) for i in range(cube_amt)] + [Model("sphere", np.array([3., 2., 0.]), 2, 0, num_vertices=1000)]   
+        )
+
+        self.shadergroups.append(wireframe_shader)
+
 
     def create_lookat_matrix(self):
 
@@ -271,48 +286,53 @@ class App:
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-            # Upload shader
-            glUseProgram(self.shader)
+            # Render each shader group
 
-            location = glGetUniformLocation(self.shader, "model") #get location on GPU using name of variable
-            glUniformMatrix4fv(
-                location,
-                1, # amt of matrices
-                GL_TRUE, # if Transposed
-                model_mat
-            )
+            # NOTE: this logic should probably be moved to each shadergroup since uniforms might differ between different shaders
+            # should probably wait with that until each group is well defined enough to warrent its own class
+            for shadergroup in self.shadergroups:
 
-            location = glGetUniformLocation(self.shader, "view") #get location on GPU using name of variable
-            glUniformMatrix4fv(
-                location,
-                1, # amt of matrices
-                GL_TRUE, # if Transposed
-                view
-            )
+                shader = shadergroup.shader
+                glUseProgram(shader)
 
-            # Specify Transformation matrix
-            location = glGetUniformLocation(self.shader, "projection") #get location on GPU using name of variable
-            glUniformMatrix4fv(
-                location,
-                1, # amt of matrices
-                GL_TRUE, # if Transposed
-                projection
-            )
+                location = glGetUniformLocation(shader, "model") #get location on GPU using name of variable
+                glUniformMatrix4fv(
+                    location,
+                    1, # amt of matrices
+                    GL_TRUE, # if Transposed
+                    model_mat
+                )
 
-            # Specify Time
-            location = glGetUniformLocation(self.shader, "u_time") #get location on GPU using name of variable
-            glUniform1f(location, u_time)
+                location = glGetUniformLocation(shader, "view") #get location on GPU using name of variable
+                glUniformMatrix4fv(
+                    location,
+                    1, # amt of matrices
+                    GL_TRUE, # if Transposed
+                    view
+                )
 
-            # Specify Screensize
-            location = glGetUniformLocation(self.shader, "u_resolution")
-            glUniform2f(location, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+                # Specify Transformation matrix
+                location = glGetUniformLocation(shader, "projection") #get location on GPU using name of variable
+                glUniformMatrix4fv(
+                    location,
+                    1, # amt of matrices
+                    GL_TRUE, # if Transposed
+                    projection
+                )
 
-            # Add 'center' position for radial shaders 
-            location = glGetUniformLocation(self.shader, "u_center")
-            glUniform2f(location, self.last_click[0], self.last_click[1])
+                # Specify Time
+                location = glGetUniformLocation(shader, "u_time") #get location on GPU using name of variable
+                glUniform1f(location, u_time)
 
-            for model in self.models:
-                model.render()
+                # Specify Screensize
+                location = glGetUniformLocation(shader, "u_resolution")
+                glUniform2f(location, self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
+
+                # Add 'center' position for radial shaders 
+                location = glGetUniformLocation(shader, "u_center")
+                glUniform2f(location, self.last_click[0], self.last_click[1])
+
+                shadergroup.render()
            
             glfw.swap_buffers(self.window)
             
@@ -330,9 +350,8 @@ class App:
             frame_count += 1
 
     def quit(self):
-        for model in self.models:
-            model.delete()
-        glDeleteProgram(self.shader)
+        for shadergroup in self.shadergroups:
+            shadergroup.delete()
         glfw.destroy_window(self.window)
         glfw.terminate()
 

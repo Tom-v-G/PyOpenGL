@@ -1,0 +1,31 @@
+// http://www.pouet.net/prod.php?which=57245
+// If you intend to reuse this shader, please add credits to 'Danilo Guanabara'
+
+#version 330 core
+
+in vec3 fragmentColor;
+
+out vec4 screenColor;
+
+uniform float u_time;
+uniform vec2 u_resolution;
+uniform vec2 u_center; 
+
+
+void main() {
+
+    vec3 c;
+	float l,z=u_time;
+	for(int i=0;i<3;i++) {
+		vec2 uv = gl_FragCoord.xy / u_resolution;
+        vec2 p = gl_FragCoord.xy / u_resolution;
+		uv=p;
+		p-=.5;
+		p.x*=u_resolution.x/u_resolution.y;
+		z+=.07;
+		l=length(p);
+		uv+=p/l*(sin(z)+1.)*abs(sin(l*9.-z-z));
+		c[i]=.01/length(mod(uv,1.)-.5);
+	}
+	screenColor=vec4(c/l,u_time);
+}

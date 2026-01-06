@@ -62,7 +62,7 @@ class App:
         self.SCREEN_HEIGHT = SCREEN_SIZE[1]
 
         self.shadergroups = []
-        
+
         self.initialize_glfw()
         self.initialize_opengl()
         self.initialize_models()
@@ -124,6 +124,16 @@ class App:
         )
 
         self.shadergroups.append(wireframe_shader)
+
+        # Orbital plane
+        standard_shader = ShaderGroup("shaders/orbital")
+        standard_shader.add_models(
+            [
+                Model("plane", (-2, 1, 1), (-2, -1, 1), (-2, 1, -1), (-2, -1, -1),   2)
+            ]
+        )
+        
+        self.shadergroups.append(standard_shader)
 
 
     def create_lookat_matrix(self):

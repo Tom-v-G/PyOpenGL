@@ -1,0 +1,35 @@
+#version 330 core
+
+const vec3[16] colors = vec3[](
+    vec3(0.894, 0.102, 0.110), // red
+    vec3(0.216, 0.494, 0.722), // blue
+    vec3(0.302, 0.686, 0.290), // green
+    vec3(0.596, 0.306, 0.639), // purple
+    vec3(1.000, 0.498, 0.000), // orange
+    vec3(1.000, 1.000, 0.200), // yellow
+    vec3(0.651, 0.337, 0.157), // brown
+    vec3(0.969, 0.506, 0.749), // pink
+    vec3(0.600, 0.600, 0.600), // gray
+    vec3(0.121, 0.470, 0.705), // deep blue
+    vec3(0.698, 0.874, 0.541), // light green
+    vec3(0.992, 0.749, 0.435), // peach
+    vec3(0.792, 0.698, 0.839), // lavender
+    vec3(0.415, 0.239, 0.603), // indigo
+    vec3(0.992, 0.553, 0.384), // coral
+    vec3(0.173, 0.627, 0.173)  // dark green
+);
+
+layout (location = 0) in vec3 vertexPosition;
+layout (location = 1) in uint vertexColor; 
+
+out vec3 fragmentColor;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+void main()
+{
+    gl_Position = projection * view * model * vec4(vertexPosition, 1.0);
+    fragmentColor = colors[vertexColor];
+}

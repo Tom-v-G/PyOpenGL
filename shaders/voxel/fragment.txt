@@ -1,0 +1,9 @@
+#version 330 core
+
+in vec3 vFragColor;
+
+out vec4 screenColor;
+
+void main() {
+    screenColor = vec4(vFragColor, 1.0);
+}

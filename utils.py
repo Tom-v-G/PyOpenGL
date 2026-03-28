@@ -4,12 +4,7 @@ import glfw.GLFW as GLFW_CONSTANTS
 from OpenGL.GL import *
 from OpenGL.GL.shaders import compileProgram, compileShader
 
-data_type_vertex = np.dtype({
-    "names": ["x", "y", "z" , "color"],
-    "formats": [np.float32, np.float32, np.float32, np.uint32],
-    "offsets": [0, 4, 8, 12],
-    "itemsize": 16
-})
+
 
 def create_shader_program(vertex_filepath: str, geometry_filepath: str, fragment_filepath: str) -> int:
 
@@ -32,3 +27,6 @@ def create_shader_module(filepath: str, module_type: int) -> int:
         source_code = file.readlines()
     
     return compileShader(source_code, module_type)
+
+def normalize(v):
+    return v / np.linalg.norm(v)

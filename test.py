@@ -39,6 +39,8 @@ data_type_vertex = np.dtype({
 # result = np.fromiter(map(tuple, vertex_list), dtype=data_type_vertex)
 # print(result)
 
+
+
 indices = np.tile(np.array([0, 1, 2, 0, 2, 3], dtype='int'), (6,1))
 for face in range(6):
     indices[face] += (face * 4)

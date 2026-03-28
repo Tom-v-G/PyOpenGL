@@ -1,4 +1,4 @@
-from config import *
+from utils import *
 
 def build_triangle_mesh() -> tuple[tuple[int], int]:
     

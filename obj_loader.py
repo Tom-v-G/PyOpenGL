@@ -1,4 +1,4 @@
-from config import *
+from utils import *
 
 class ObjLoader():
 

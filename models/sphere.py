@@ -1,7 +1,7 @@
 import sys 
 
 sys.path.append(".")
-from config import *
+from utils import *
 
 class Sphere():
 

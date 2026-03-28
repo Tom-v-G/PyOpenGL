@@ -10,15 +10,23 @@ out vec4 screenColor;
 uniform float u_time;
 uniform vec2 u_resolution;
 uniform vec2 u_center; 
+uniform mat3 u_orbital_transform;
 
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+uniform vec3 u_norm_vec;
 
 void main() {
 
     vec3 c;
 	float l,z=u_time;
 	for(int i=0;i<3;i++) {
-		vec2 uv = gl_FragCoord.xy / u_resolution;
-        vec2 p = gl_FragCoord.xy / u_resolution;
+		// vec2 uv = (u_orbital_transform * vec3(gl_FragCoord.xy / u_resolution, 0)).xy ;
+        // vec2 p = (u_orbital_transform * vec3(gl_FragCoord.xy / u_resolution, 0)).xy ;
+		vec2 uv = (projection * view * model * vec4(u_orbital_transform * vec3(gl_FragCoord.x / u_resolution[0], gl_FragCoord.y / u_resolution[1], 0) + u_norm_vec, 1) ).xy;
+        vec2 p = (projection * view * model * vec4(u_orbital_transform * vec3(gl_FragCoord.x / u_resolution[0], gl_FragCoord.y / u_resolution[1], 0) + u_norm_vec, 1)   ).xy;
 		uv=p;
 		p-=.5;
 		p.x*=u_resolution.x/u_resolution.y;

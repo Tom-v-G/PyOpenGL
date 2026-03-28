@@ -4,8 +4,9 @@ from OpenGL.GL import *
 from utils import create_shader_program
 
 class ChunkManager():
-    def __init__(self):
+    def __init__(self, player):
         self.chunks = {}
+        self.player = player
         filepath = "shaders/voxel"
         self.shader = create_shader_program(f"{filepath}/vertex.txt", f"{filepath}/geometry.txt", f"{filepath}/fragment.txt")
         

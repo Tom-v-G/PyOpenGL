@@ -7,10 +7,13 @@ from OpenGL.GL.shaders import compileProgram, compileShader
 import time
 import sys
 
+from hud import HUD
 from input import InputHandler
 from math_utils import create_lookat_matrix, create_perspective_matrix
 from models.chunk import Chunk
 from models.voxel import Voxel
+from player import Player
+from terraingenerator import TerrainGenerator
 
 sys.path.append(".")
 from chunkmanager import ChunkManager
@@ -61,18 +64,20 @@ class ShaderGroup:
 
 class App:
 
-    def __init__(self, SCREEN_SIZE):
+    def __init__(self, SCREEN_SIZE: tuple[int, int]):
         # OpenGL
-        self.SCREEN_WIDTH = SCREEN_SIZE[0] # Note: overriden by initialize_glfw.
-        self.SCREEN_HEIGHT = SCREEN_SIZE[1]
+        self.SCREEN_WIDTH: int = SCREEN_SIZE[0] # Note: overriden by initialize_glfw.
+        self.SCREEN_HEIGHT: int = SCREEN_SIZE[1]
 
         self.window = self.initialize_glfw()
         self.initialize_opengl()
 
         self.shadergroups = []
-        self.chunkmanager = ChunkManager()
-        self.input_handler = InputHandler(self.window, self.chunkmanager)
-
+        self.player = Player([0., 20., 20.])
+        self.chunkmanager = ChunkManager(self.player)
+        self.terraingenerator = TerrainGenerator(0, self.chunkmanager)
+        self.input_handler = InputHandler(self.window, self.chunkmanager, self.player)
+        self.hud = HUD(SCREEN_SIZE)
         self.initialize_models()
         
         self.camera_pos = np.array([0., 20, 20], dtype=np.float32)
@@ -129,7 +134,8 @@ class App:
         print(glGetString(GL_RENDERER))
         print(glGetString(GL_VENDOR))
         glfw.swap_interval(0) # Vsync
-        # glfw.set_input_mode(self.window, GLFW_CONSTANTS.GLFW_CURSOR, GLFW_CONSTANTS.GLFW_CURSOR_DISABLED) # lock cursor to screen
+        glfw.set_input_mode(window, GLFW_CONSTANTS.GLFW_CURSOR, GLFW_CONSTANTS.GLFW_CURSOR_DISABLED)
+        glfw.set_input_mode(window, GLFW_CONSTANTS.GLFW_RAW_MOUSE_MOTION, GLFW_CONSTANTS.GLFW_TRUE)
 
         return window
     
@@ -141,6 +147,10 @@ class App:
         glEnable(GL_CULL_FACE)
 
     def initialize_models(self):
+        
+        for x in range(4):
+            for z in range(4):
+                self.terraingenerator.create_chunk(x, z)
 
         # Default rendering technique
         # standard_shader = ShaderGroup("shaders/standard")
@@ -166,62 +176,62 @@ class App:
         
         # chunk_list = []
 
-        cube_array = [
-            [ [None for _ in range(16)] for _ in range(16)] for _ in range(16)
-        ]
-        for x in range(16):
-            for y in range(16):
-                for z in range(16):
-                    color = np.random.choice([i for i in range(16)])
-                    if y < 9 and np.random.rand() < 0.8:
-                        cube_array[x][y][z] = color
-                    else :
-                        cube_array[x][y][z] = None
+        # cube_array = [
+        #     [ [None for _ in range(16)] for _ in range(16)] for _ in range(16)
+        # ]
+        # for x in range(16):
+        #     for y in range(16):
+        #         for z in range(16):
+        #             color = np.random.choice([i for i in range(16)])
+        #             if y < 9 and np.random.rand() < 0.8:
+        #                 cube_array[x][y][z] = color
+        #             else :
+        #                 cube_array[x][y][z] = None
         
-        self.chunkmanager.add_chunk(Chunk(cube_array, pos_x=0, pos_y=0, pos_z=0))
+        # self.chunkmanager.add_chunk(Chunk(cube_array, pos_x=0, pos_y=0, pos_z=0))
 
-        cube_array = [
-            [ [None for _ in range(16)] for _ in range(16)] for _ in range(16)
-        ]
-        for x in range(16):
-            for y in range(16):
-                for z in range(16):
-                    color = np.random.choice([i for i in range(16)])
-                    if x < 6 and np.random.rand() < 0.8:
-                        cube_array[x][y][z] = color
-                    else :
-                        cube_array[x][y][z] = None
+        # cube_array = [
+        #     [ [None for _ in range(16)] for _ in range(16)] for _ in range(16)
+        # ]
+        # for x in range(16):
+        #     for y in range(16):
+        #         for z in range(16):
+        #             color = np.random.choice([i for i in range(16)])
+        #             if x < 6 and np.random.rand() < 0.8:
+        #                 cube_array[x][y][z] = color
+        #             else :
+        #                 cube_array[x][y][z] = None
 
-        self.chunkmanager.add_chunk(Chunk(cube_array, pos_x=1, pos_y=0, pos_z=0))
+        # self.chunkmanager.add_chunk(Chunk(cube_array, pos_x=1, pos_y=0, pos_z=0))
 
 
-        cube_array = [
-            [ [None for _ in range(16)] for _ in range(16)] for _ in range(16)
-        ]
-        for x in range(16):
-            for y in range(16):
-                for z in range(16):
-                    color = np.random.choice([i for i in range(16)])
-                    if x > 10 and np.random.rand() < 0.8:
-                        cube_array[x][y][z] = color
-                    else :
-                        cube_array[x][y][z] = None
+        # cube_array = [
+        #     [ [None for _ in range(16)] for _ in range(16)] for _ in range(16)
+        # ]
+        # for x in range(16):
+        #     for y in range(16):
+        #         for z in range(16):
+        #             color = np.random.choice([i for i in range(16)])
+        #             if x > 10 and np.random.rand() < 0.8:
+        #                 cube_array[x][y][z] = color
+        #             else :
+        #                 cube_array[x][y][z] = None
 
-        self.chunkmanager.add_chunk(Chunk(cube_array, pos_x=-1, pos_y=0, pos_z=0))
+        # self.chunkmanager.add_chunk(Chunk(cube_array, pos_x=-1, pos_y=0, pos_z=0))
 
-        cube_array = [
-            [ [None for _ in range(16)] for _ in range(16)] for _ in range(16)
-        ]
-        for x in range(16):
-            for y in range(16):
-                for z in range(16):
-                    color = np.random.choice([i for i in range(16)])
-                    if y < 4 and np.random.rand() < 0.8:
-                        cube_array[x][y][z] = color
-                    else :
-                        cube_array[x][y][z] = None
+        # cube_array = [
+        #     [ [None for _ in range(16)] for _ in range(16)] for _ in range(16)
+        # ]
+        # for x in range(16):
+        #     for y in range(16):
+        #         for z in range(16):
+        #             color = np.random.choice([i for i in range(16)])
+        #             if y < 4 and np.random.rand() < 0.8:
+        #                 cube_array[x][y][z] = color
+        #             else :
+        #                 cube_array[x][y][z] = None
 
-        self.chunkmanager.add_chunk(Chunk(cube_array, pos_x=0, pos_y=0, pos_z=1))
+        # self.chunkmanager.add_chunk(Chunk(cube_array, pos_x=0, pos_y=0, pos_z=1))
 
         # voxel_shader.add_models(chunk_list)
         # wireframe_shader.add_models(chunk_list)
@@ -258,130 +268,30 @@ class App:
         self.norm_vec = np.array([-1, 0, 0])
         
         # self.shadergroups.append(standard_shader)
-
-
-    def check_input(self):
-
-        # Check for closing event
-        if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_ESCAPE) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.EXIT = True
-        glfw.poll_events()
-
-        # Check for resize
-        # NEW_SCREEN_WIDTH, NEW_SCREEN_HEIGHT = glfw.get_window_size(self.window)
-        # print(NEW_SCREEN_WIDTH)
-        # print(self.SCREEN_WIDTH)
-        # if (isinstance(NEW_SCREEN_WIDTH, int) and isinstance(NEW_SCREEN_HEIGHT, int)) and (NEW_SCREEN_WIDTH != self.SCREEN_WIDTH or NEW_SCREEN_HEIGHT != self.SCREEN_HEIGHT):
-        #     print('resizing window')
-        #     self.SCREEN_WIDTH = NEW_SCREEN_WIDTH
-        #     self.SCREEN_HEIGHT = NEW_SCREEN_HEIGHT
-        #     self.initialize_opengl()
-
-        # Calculate timedelta
-        
-        delta_time = self.current_time - self.last_frame_time
-        self.last_frame_time = self.current_time
-
-        # Check mouse movement
-        curr_position = glfw.get_cursor_pos(self.window)
-        self.mouse_positions = np.roll(self.mouse_positions, 1, axis=0)
-        self.mouse_positions[0] = (curr_position[0] / self.SCREEN_WIDTH, 1 - curr_position[1] / self.SCREEN_HEIGHT)
-
-        # Check mouse press 
-        if glfw.get_mouse_button(self.window, GLFW_CONSTANTS.GLFW_MOUSE_BUTTON_1) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.last_click = self.mouse_positions[0]
-
-        # Camera Strafing Movement
-        if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_W) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pos += delta_time * self.movement_speed * self.camera_front
-            # self.camera_target[2] -= self.movement_speed
-        if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_S) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pos -= delta_time * self.movement_speed * self.camera_front
-            # self.camera_target[2] += self.movement_speed
-        if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_D) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pos += delta_time * self.movement_speed * np.cross(self.camera_front, self.camera_up)
-            # self.camera_target[0] += self.movement_speed
-        if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_A) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pos -= delta_time * self.movement_speed * np.cross(self.camera_front, self.camera_up)
-            # self.camera_target[0] -= self.movement_speed
-        if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_SPACE) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pos += delta_time * self.movement_speed * self.camera_up
-            # self.camera_target[1] += self.movement_speed
-        if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_LEFT_SHIFT) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pos -= delta_time * self.movement_speed * self.camera_up
-            # self.camera_target[1] -= self.movement_speed
-
-        # # Camera Rotation 
-        offset = self.mouse_positions[0] - self.mouse_positions[1]
-
-        self.camera_yaw += delta_time * self.mouse_sensitivity * offset[0]
-        self.camera_pitch += delta_time * self.mouse_sensitivity * offset[1]
-
-        if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_UP) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pitch += delta_time * self.movement_speed * 10
-        if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_DOWN) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_pitch -= delta_time * self.movement_speed * 10
-        if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_RIGHT) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_yaw -= delta_time * self.movement_speed * 10
-        if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_LEFT) == GLFW_CONSTANTS.GLFW_PRESS:
-            self.camera_yaw += delta_time * self.movement_speed * 10   
-
-        if self.camera_pitch > 89:
-            self.camera_pitch = 89.
-        if self.camera_pitch < -89:
-            self.camera_pitch = -89.
-
-        self.camera_front = normalize(np.array(
-            [
-                np.cos(np.deg2rad(self.camera_yaw)) * np.cos(np.deg2rad(self.camera_pitch)), # x
-                np.sin(np.deg2rad(self.camera_pitch)), # y
-                np.sin(np.deg2rad(self.camera_yaw)) * np.cos(np.deg2rad(self.camera_pitch)) # z
-            ]
-        ))
-
-        # Additional keybindings
-        if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_EQUAL) == GLFW_CONSTANTS.GLFW_PRESS:
-            if self.x is None:
-                self.x = 3
-            cube_array = [
-                [ [None for _ in range(16)] for _ in range(16)] for _ in range(16)
-            ]
-            for x in range(16):
-                for y in range(16):
-                    for z in range(16):
-                        color = np.random.choice([i for i in range(16)])
-                        if np.random.rand() < 0.8:
-                            cube_array[x][y][z] = color
-                        else :
-                            cube_array[x][y][z] = None
-
-            self.chunkmanager.add_chunk(Chunk(cube_array, pos_x=self.x, pos_y=1, pos_z=0))
-            self.x += 1
-        
-        if glfw.get_key(self.window, GLFW_CONSTANTS.GLFW_KEY_MINUS) == GLFW_CONSTANTS.GLFW_PRESS:
-            if self.x is not None:
-                print(f"removing chunk at x = {self.x - 1}")
-                self.chunkmanager.remove_chunk(self.x - 1, 1, 0)
-                self.x -= 1
-        
+ 
     def run(self):
-
-
         
-        # projection = np.identity(4)
-
-        self.current_time = glfw.get_time()
+        fps = 0
         frame_count = 0 
 
         projection = create_perspective_matrix(1000, 0.1, 90, self.SCREEN_WIDTH / self.SCREEN_HEIGHT)
 
         while not glfw.window_should_close(self.window):
             
+            self.current_time = glfw.get_time()
+
             # Calculate timedelta        
             delta_time = self.current_time - self.last_frame_time
             self.last_frame_time = self.current_time
             self.input_handler.handle_input(delta_time)
-            # self.check_input()
+
+            # Calculate FPS
+            if self.current_time - self.update_time >= 0.5:
+                fps = frame_count
+                frame_count = 0
+                self.update_time = self.current_time             
+            else:
+                frame_count += 1
 
             if self.EXIT:
                 break
@@ -425,14 +335,15 @@ class App:
             # model = np.identity(4, dtype=np.float32)
 
             # Create View Matrix
-            camera_pos, camera_front, camera_up = self.input_handler.camera
+            camera_pos, camera_front, camera_up = self.player.camera
             view = create_lookat_matrix(camera_pos, camera_front, camera_up)
 
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
             # Render each shader group
 
             self.chunkmanager.render(view, projection)
+            self.hud.render(f"FPS: {fps}")
 
             # NOTE: this logic should probably be moved to each shadergroup since uniforms might differ between different shaders
             # should probably wait with that until each group is well defined enough to warrent its own class
@@ -494,19 +405,7 @@ class App:
            
             glfw.swap_buffers(self.window)
             
-            # Calculate FPS
-            self.current_time = glfw.get_time()
 
-            if self.current_time - self.update_time >= 0.5:
-                glfw.set_window_title(self.window, f"FPS: {(frame_count):.0f}")
-                frame_count = 0
-                self.update_time = self.current_time
-
-                # print(self.camera_yaw)
-                # print(self.camera_pitch)
-                # print(self.camera_front)                
-
-            frame_count += 1
 
     def quit(self):
         for shadergroup in self.shadergroups:
@@ -522,15 +421,7 @@ class App:
 
 if __name__ == "__main__":
 
-    # print(glGetString(GL_RENDERER))
-    # print(glGetString(GL_VENDOR))
-    
-    # print("OpenGL version:", glGetString(GL_VERSION))
-
-    # time.sleep(1)
-    # temp = input()
-    # SCREEN_SIZE = [1920, 1080]
-    SCREEN_SIZE = [2560, 1440]
+    SCREEN_SIZE = (2560, 1440)
     my_app = App(SCREEN_SIZE)
     my_app.run()
     my_app.quit()

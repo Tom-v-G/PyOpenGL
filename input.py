@@ -7,19 +7,14 @@ from utils import normalize
 
 
 class InputHandler:
-    def __init__(self, window, chunkmanager):
+    def __init__(self, window, chunkmanager, player):
         self.window = window
         self.chunkmanager = chunkmanager
+        self.player = player
 
         self.SCREEN_WIDTH, self.SCREEN_HEIGHT = glfw.get_window_size(self.window)
 
-        self.camera_pos = np.array([0., 20, 20], dtype=np.float32)
-        self.camera_front = np.array([0., 0., -1.], dtype=np.float32)
-        self.camera_up = np.array([0., 1., 0.], dtype=np.float32)
-        self.camera_yaw = -90.0
-        self.camera_pitch = 0.0
-        self.movement_speed = 20
-        self.mouse_sensitivity = 50000
+        self.mouse_sensitivity = 20000
 
         self.last_click = np.array([0.5, 0.5], dtype=np.float32)
         self.mouse_positions = np.array([[0.5, 0.5] for i in range(2)], dtype=np.float32)
@@ -44,11 +39,6 @@ class InputHandler:
 
         self.prev_keys = {}
         self.update_key_states() # Initialize self.prev_keys with the current key states.
-
-    
-    @property
-    def camera(self):
-        return self.camera_pos, self.camera_front, self.camera_up
 
 
     def is_key_down(self, key):
@@ -90,47 +80,33 @@ class InputHandler:
         if glfw.get_mouse_button(self.window, GLFW_CONSTANTS.GLFW_MOUSE_BUTTON_1) == GLFW_CONSTANTS.GLFW_PRESS:
             self.last_click = self.mouse_positions[0]
 
-        # Camera Strafing Movement
+        # Player movement and rotation
         if self.is_key_down(self.key_bindings["move_forward"]):
-            self.camera_pos += delta_time * self.movement_speed * self.camera_front
+            self.player.move_forward(delta_time)
         if self.is_key_down(self.key_bindings["move_backward"]):
-            self.camera_pos -= delta_time * self.movement_speed * self.camera_front
+            self.player.move_backward(delta_time)
         if self.is_key_down(self.key_bindings["move_right"]):
-            self.camera_pos += delta_time * self.movement_speed * np.cross(self.camera_front, self.camera_up)
+            self.player.move_right(delta_time)
         if self.is_key_down(self.key_bindings["move_left"]):
-            self.camera_pos -= delta_time * self.movement_speed * np.cross(self.camera_front, self.camera_up)
+            self.player.move_left(delta_time)
         if self.is_key_down(self.key_bindings["move_up"]):
-            self.camera_pos += delta_time * self.movement_speed * self.camera_up
+            self.player.move_up(delta_time)
         if self.is_key_down(self.key_bindings["move_down"]):
-            self.camera_pos -= delta_time * self.movement_speed * self.camera_up
-
-        # # Camera Rotation 
-        offset = self.mouse_positions[0] - self.mouse_positions[1]
-
-        self.camera_yaw += delta_time * self.mouse_sensitivity * offset[0]
-        self.camera_pitch += delta_time * self.mouse_sensitivity * offset[1]
+            self.player.move_down(delta_time)
 
         if self.is_key_down(self.key_bindings["look_up"]):
-            self.camera_pitch += delta_time * self.movement_speed * 10
+            self.player.look_up(delta_time)
         if self.is_key_down(self.key_bindings["look_down"]):
-            self.camera_pitch -= delta_time * self.movement_speed * 10
+            self.player.look_down(delta_time)
         if self.is_key_down(self.key_bindings["look_right"]):
-            self.camera_yaw += delta_time * self.movement_speed * 10
+            self.player.look_right(delta_time)
         if self.is_key_down(self.key_bindings["look_left"]):
-            self.camera_yaw -= delta_time * self.movement_speed * 10   
+            self.player.look_left(delta_time)
 
-        if self.camera_pitch > 89:
-            self.camera_pitch = 89.
-        if self.camera_pitch < -89:
-            self.camera_pitch = -89.
+        # # Camera Rotation via mouse movement
+        offset = (self.mouse_positions[0] - self.mouse_positions[1]) * self.mouse_sensitivity
+        self.player.process_rotation(delta_time, offset)
 
-        self.camera_front = normalize(np.array(
-            [
-                np.cos(np.deg2rad(self.camera_yaw)) * np.cos(np.deg2rad(self.camera_pitch)), # x
-                np.sin(np.deg2rad(self.camera_pitch)), # y
-                np.sin(np.deg2rad(self.camera_yaw)) * np.cos(np.deg2rad(self.camera_pitch)) # z
-            ]
-        ))
 
         # Adding chunks 
         if self.is_key_pressed(self.key_bindings["add_chunk"]):

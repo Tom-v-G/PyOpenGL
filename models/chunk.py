@@ -1,6 +1,7 @@
 
-from ctypes import c_uint
+import ctypes
 
+import OpenGL.GL as GL
 from utils import *
 from models.voxel import Voxel
 
@@ -108,14 +109,14 @@ class Chunk():
         del voxel
     
 
-    def build_mesh(self) -> tuple[int, int, int]:
+    def build_mesh(self) -> None:
 
-        self.vao = glGenVertexArrays(1)
-        glBindVertexArray(self.vao)
+        self.vao = GL.glGenVertexArrays(1)
+        GL.glBindVertexArray(self.vao)
 
-        self.vbo = glGenBuffers(1)
-        glBindBuffer(GL_ARRAY_BUFFER, self.vbo)
-        glBufferData(GL_ARRAY_BUFFER, self.combined_cubes.nbytes, self.combined_cubes, GL_STATIC_DRAW)
+        self.vbo = GL.glGenBuffers(1)
+        GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo)
+        GL.glBufferData(GL.GL_ARRAY_BUFFER, self.combined_cubes.nbytes, self.combined_cubes, GL.GL_STATIC_DRAW)
 
         # create attribute pointer
         
@@ -124,15 +125,15 @@ class Chunk():
         stride = data_type_vertex.itemsize # bytes ; amt of data between vertices
         offset = 0 # 
         
-        glVertexAttribPointer(
+        GL.glVertexAttribPointer(
             attribute_index, 
             size, 
-            GL_FLOAT, # datatype 
-            GL_FALSE, # normalization
+            GL.GL_FLOAT, # datatype 
+            GL.GL_FALSE, # normalization
             stride, 
             ctypes.c_void_p(offset) # void pointer: raw memory location
         )
-        glEnableVertexAttribArray(attribute_index)
+        GL.glEnableVertexAttribArray(attribute_index)
         offset += 12
 
         # COLOR
@@ -140,24 +141,24 @@ class Chunk():
         size = 1 # bytes ; length of vector
         
         # attrib-I-pointer: integer pointer, no normalization
-        glVertexAttribIPointer(
+        GL.glVertexAttribIPointer(
             attribute_index, 
             size, 
-            GL_UNSIGNED_INT, # datatype 
+            GL.GL_UNSIGNED_INT, # datatype 
             stride, 
             ctypes.c_void_p(offset) # void pointer: raw memory location
         )
-        glEnableVertexAttribArray(attribute_index)
+        GL.glEnableVertexAttribArray(attribute_index)
 
         # return (None, self.vbo, self.vao)
 
     def render(self):
-        glBindVertexArray(self.vbo)
-        glDrawArrays(GL_TRIANGLES, 0, self.vertex_count)
+        GL.glBindVertexArray(self.vbo)
+        GL.glDrawArrays(GL.GL_TRIANGLES, 0, self.vertex_count)
 
     def delete(self):
-        glDeleteBuffers(1, (self.vbo,))
-        glDeleteVertexArrays(1, (self.vao,))
+        GL.glDeleteBuffers(1, (self.vbo,))
+        GL.glDeleteVertexArrays(1, (self.vao,))
 
 
 

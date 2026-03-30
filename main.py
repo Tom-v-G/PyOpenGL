@@ -22,7 +22,7 @@ import mesh_factory
 from models import *
 from obj_loader import ObjLoader
 
-
+CHUNK_SIZE = 16
 class Model:
 
     def __init__(self, type, *args, **kwargs):
@@ -74,8 +74,8 @@ class App:
 
         self.shadergroups = []
         self.player = Player([0., 20., 20.])
-        self.chunkmanager = ChunkManager(self.player)
-        self.terraingenerator = TerrainGenerator(0, self.chunkmanager)
+        self.terraingenerator = TerrainGenerator(0)
+        self.chunkmanager = ChunkManager(self.player, self.terraingenerator)
         self.input_handler = InputHandler(self.window, self.chunkmanager, self.player)
         self.hud = HUD(SCREEN_SIZE)
         self.initialize_models()
@@ -148,10 +148,6 @@ class App:
 
     def initialize_models(self):
         
-        for x in range(4):
-            for z in range(4):
-                self.terraingenerator.create_chunk(x, z)
-
         # Default rendering technique
         # standard_shader = ShaderGroup("shaders/standard")
         # standard_shader.add_models(
@@ -285,6 +281,9 @@ class App:
             self.last_frame_time = self.current_time
             self.input_handler.handle_input(delta_time)
 
+            # Update chunkmanager
+            self.chunkmanager.update_renderlist()
+
             # Calculate FPS
             if self.current_time - self.update_time >= 0.5:
                 fps = frame_count
@@ -343,7 +342,10 @@ class App:
             # Render each shader group
 
             self.chunkmanager.render(view, projection)
-            self.hud.render(f"FPS: {fps}")
+            x, y, z = self.player.position
+            text = f"FPS: {fps} \nx={x:.2f} y={y:.2f} z={z:.2f}\nChunk Coordinates: ({x // CHUNK_SIZE}, {y // CHUNK_SIZE}, {z // CHUNK_SIZE})"
+
+            self.hud.render(text)
 
             # NOTE: this logic should probably be moved to each shadergroup since uniforms might differ between different shaders
             # should probably wait with that until each group is well defined enough to warrent its own class
@@ -408,6 +410,7 @@ class App:
 
 
     def quit(self):
+        self.chunkmanager.cleanup()
         for shadergroup in self.shadergroups:
             shadergroup.delete()
         glfw.destroy_window(self.window)

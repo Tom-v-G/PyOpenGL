@@ -22,18 +22,20 @@ class Chunk():
     Initial chunk size set to 16x16x16 (4096 cubes). 
     """
 
-    def __init__(self, cube_array, pos_x = 0, pos_y = 0, pos_z = 0): 
+    def __init__(self, cube_array, position: tuple[int, int, int]): 
         if len(cube_array) != CHUNK_SIZE or len(cube_array[0]) != CHUNK_SIZE or len(cube_array[0][0]) != CHUNK_SIZE:
             raise ValueError("cube_array must be a 16x16x16 array")
         
-        self.pos_x = pos_x
-        self.pos_y = pos_y
-        self.pos_z = pos_z
+        self.pos_x, self.pos_y, self.pos_z = position
         
         self.combined_cubes = np.array([], dtype= data_type_vertex)
-        self.create_mesh(cube_array)
+        self.create_voxel_array(cube_array)
         self.vertex_count = int(len(self.combined_cubes))
-        self.build_mesh()
+
+        self.vao, self.vbo = None, None
+        self.is_built = False
+
+
     
     def __del__(self):
         try:
@@ -42,7 +44,7 @@ class Chunk():
             pass
 
 
-    def create_mesh(self, cube_array): 
+    def create_voxel_array(self, cube_array): 
         
         for x in range(CHUNK_SIZE):
             for y in range(CHUNK_SIZE):
@@ -150,15 +152,17 @@ class Chunk():
         )
         GL.glEnableVertexAttribArray(attribute_index)
 
-        # return (None, self.vbo, self.vao)
+        self.is_built = True
 
     def render(self):
         GL.glBindVertexArray(self.vbo)
         GL.glDrawArrays(GL.GL_TRIANGLES, 0, self.vertex_count)
 
     def delete(self):
-        GL.glDeleteBuffers(1, (self.vbo,))
-        GL.glDeleteVertexArrays(1, (self.vao,))
+        if self.vbo is not None:
+            GL.glDeleteBuffers(1, (self.vbo,))
+        if self.vao is not None:
+            GL.glDeleteVertexArrays(1, (self.vao,))
 
 
 

@@ -20,7 +20,7 @@ class Player():
 
     def __init__(self, pos): 
         
-        self.camera_pos = np.array(pos, dtype=np.float32)
+        self.position = np.array(pos, dtype=np.float32)
         self.camera_front = np.array([0., 0., -1.], dtype=np.float32)
         self.camera_up = np.array([0., 1., 0.], dtype=np.float32)
         self.camera_yaw = -90.0
@@ -30,25 +30,26 @@ class Player():
 
     @property
     def camera(self):
-        return self.camera_pos, self.camera_front, self.camera_up
+        return self.position, self.camera_front, self.camera_up
+    
 
     def move_forward(self, delta_time):
-        self.camera_pos += delta_time * self.movement_speed * self.camera_front
+        self.position += delta_time * self.movement_speed * self.camera_front
 
     def move_backward(self, delta_time):
-        self.camera_pos -= delta_time * self.movement_speed * self.camera_front
+        self.position -= delta_time * self.movement_speed * self.camera_front
     
     def move_right(self, delta_time):
-        self.camera_pos += delta_time * self.movement_speed * np.cross(self.camera_front, self.camera_up)
+        self.position += delta_time * self.movement_speed * np.cross(self.camera_front, self.camera_up)
 
     def move_left(self, delta_time):
-        self.camera_pos -= delta_time * self.movement_speed * np.cross(self.camera_front, self.camera_up)
+        self.position -= delta_time * self.movement_speed * np.cross(self.camera_front, self.camera_up)
 
     def move_up(self, delta_time):
-        self.camera_pos += delta_time * self.movement_speed * self.camera_up
+        self.position += delta_time * self.movement_speed * self.camera_up
 
     def move_down(self, delta_time):
-        self.camera_pos -= delta_time * self.movement_speed * self.camera_up
+        self.position -= delta_time * self.movement_speed * self.camera_up
 
     @update_camera_front
     def look_up(self, delta_time):

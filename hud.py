@@ -110,9 +110,6 @@ class HUD():
                 "advance": typeface.glyph.advance.x
             }
 
-            print(chr(char_code))
-            # print(data)
-            print(bitmap.width, bitmap.rows, bitmap.pitch)
 
         return characters
     
@@ -137,15 +134,22 @@ class HUD():
         GL.glBindBuffer(GL.GL_ARRAY_BUFFER, self.vbo)
 
         # Start display in top left corner
-        x = 50
-        y = int(0.92 * self.SCREEN_HEIGHT)
+        left_x = 50
+        x = left_x
+        top_y = int(0.92 * self.SCREEN_HEIGHT)
+        y = top_y
         scale = 0.75
 
 
         for char in text:
+            
+            if char == '\n':
+                x = left_x
+                y -= 40
+                continue
+
             ch = self.characters[char]
 
-            # print(ch["size"])
             xpos = x + ch["bearing"][0] * scale
             ypos = y - (ch["size"][1] - ch["bearing"][1]) * scale
 

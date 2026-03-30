@@ -20,6 +20,8 @@
 - [x] implement voxel chunk manager
 - [ ] implement saving to / loading from disk
 - [x] simple terrain generation
+- [ ] Render distance mesh
+- [ ] Chunk border mesh
 - [ ] perlin noise terrain generation
 - [ ] player dependent chunk loading / generation
 - [ ] LOD for 'infinite' render distance.

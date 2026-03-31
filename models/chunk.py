@@ -33,7 +33,7 @@ class Chunk():
         self.vertex_count = int(len(self.combined_cubes))
 
         self.vao, self.vbo = None, None
-        self.is_built = False
+        self.is_uploaded = False
 
 
     
@@ -111,7 +111,7 @@ class Chunk():
         del voxel
     
 
-    def build_mesh(self) -> None:
+    def upload_mesh(self) -> None:
 
         self.vao = GL.glGenVertexArrays(1)
         GL.glBindVertexArray(self.vao)
@@ -152,7 +152,7 @@ class Chunk():
         )
         GL.glEnableVertexAttribArray(attribute_index)
 
-        self.is_built = True
+        self.is_uploaded = True
 
     def render(self):
         GL.glBindVertexArray(self.vbo)

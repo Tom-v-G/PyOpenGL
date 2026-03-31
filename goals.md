@@ -23,9 +23,12 @@
 - [ ] Render distance mesh
 - [ ] Chunk border mesh
 - [ ] perlin noise terrain generation
-- [ ] player dependent chunk loading / generation
+- [x] player dependent chunk loading / generation
 - [ ] LOD for 'infinite' render distance.
+- [ ] LOD boundary mesh
 - [ ] collision detection (simple physics)
+- [ ] frustum culling
+- [ ] frustrum mesh
 - [ ] sprites (?)
 - [ ] lighting system
 

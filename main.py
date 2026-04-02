@@ -340,10 +340,16 @@ class App:
             glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
             # Render each shader group
-
+            self.chunkmanager.update()
             self.chunkmanager.render(view, projection)
+
             x, y, z = self.player.position
-            text = f"FPS: {fps} \nx={x:.2f} y={y:.2f} z={z:.2f}\nChunk Coordinates: ({x // CHUNK_SIZE}, {y // CHUNK_SIZE}, {z // CHUNK_SIZE})"
+
+            text = f"""FPS: {fps}
+x={x:.2f} y={y:.2f} z={z:.2f}
+Chunk Coordinates: ({x // CHUNK_SIZE}, {y // CHUNK_SIZE}, {z // CHUNK_SIZE})
+Chunks in Memory: {self.chunkmanager.renderlist_size} (renderlist) : {self.chunkmanager.cache_size} (cache) : {self.chunkmanager.chunkdict_size} (chunk dict)
+"""
 
             self.hud.render(text)
 

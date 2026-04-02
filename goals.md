@@ -21,6 +21,7 @@
 - [ ] implement saving to / loading from disk
 - [x] simple terrain generation
 - [ ] Render distance mesh
+- [ ] Use chunk state enums
 - [ ] Chunk border mesh
 - [ ] perlin noise terrain generation
 - [x] player dependent chunk loading / generation
@@ -28,7 +29,8 @@
 - [ ] LOD boundary mesh
 - [ ] collision detection (simple physics)
 - [ ] frustum culling
-- [ ] frustrum mesh
+- [ ] frustum mesh
+- [ ] chunk isEmpty boolean: blijft uit chunk dict.
 - [ ] sprites (?)
 - [ ] lighting system
 

@@ -7,9 +7,10 @@ from utils import normalize
 
 
 class InputHandler:
-    def __init__(self, window, chunkmanager, player):
+    def __init__(self, window, chunkmanager, border_renderer, player):
         self.window = window
         self.chunkmanager = chunkmanager
+        self.border_renderer = border_renderer
         self.player = player
 
         self.SCREEN_WIDTH, self.SCREEN_HEIGHT = glfw.get_window_size(self.window)
@@ -34,7 +35,8 @@ class InputHandler:
             "look_left": GLFW_CONSTANTS.GLFW_KEY_LEFT,
             "menu": GLFW_CONSTANTS.GLFW_KEY_ESCAPE,
             "add_chunk": GLFW_CONSTANTS.GLFW_KEY_EQUAL,
-            "remove_chunk": GLFW_CONSTANTS.GLFW_KEY_MINUS
+            "remove_chunk": GLFW_CONSTANTS.GLFW_KEY_MINUS,
+            "show_chunkborders": GLFW_CONSTANTS.GLFW_KEY_F3
         }
 
         self.prev_keys = {}
@@ -107,6 +109,9 @@ class InputHandler:
         offset = (self.mouse_positions[0] - self.mouse_positions[1]) * self.mouse_sensitivity
         self.player.process_rotation(delta_time, offset)
 
+        # Debug Options
+        if self.is_key_pressed(self.key_bindings["show_chunkborders"]):
+            self.border_renderer.enabled = not self.border_renderer.enabled
 
         # Adding chunks 
         if self.is_key_pressed(self.key_bindings["add_chunk"]):

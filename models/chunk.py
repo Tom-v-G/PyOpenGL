@@ -155,7 +155,7 @@ class Chunk():
         self.is_uploaded = True
 
     def render(self):
-        GL.glBindVertexArray(self.vbo)
+        GL.glBindVertexArray(self.vao)
         GL.glDrawArrays(GL.GL_TRIANGLES, 0, self.vertex_count)
 
     def delete(self):

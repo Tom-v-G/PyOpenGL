@@ -11,6 +11,7 @@ from hud import HUD
 from input import InputHandler
 from math_utils import create_lookat_matrix, create_perspective_matrix
 from models.chunk import Chunk
+from models.chunk_border import ChunkBorderRenderer
 from models.voxel import Voxel
 from player import Player
 from terraingenerator import TerrainGenerator
@@ -76,7 +77,8 @@ class App:
         self.player = Player([0., 20., 20.])
         self.terraingenerator = TerrainGenerator(0)
         self.chunkmanager = ChunkManager(self.player, self.terraingenerator)
-        self.input_handler = InputHandler(self.window, self.chunkmanager, self.player)
+        self.border_renderer = ChunkBorderRenderer()
+        self.input_handler = InputHandler(self.window, self.chunkmanager, self.border_renderer, self.player)
         self.hud = HUD(SCREEN_SIZE)
         self.initialize_models()
         
@@ -342,6 +344,8 @@ class App:
             # Render each shader group
             self.chunkmanager.update()
             self.chunkmanager.render(view, projection)
+            self.border_renderer.render(self.chunkmanager.renderlist, view, projection)
+
 
             x, y, z = self.player.position
 
